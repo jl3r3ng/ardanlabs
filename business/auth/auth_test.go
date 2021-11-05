@@ -5,7 +5,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
-	"gitlab.com/FireH24d/service/business/auth"
+	"gitlab.com/FireH24d/business/auth"
 	"testing"
 	"time"
 )

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/pkg/errors"
-	"gitlab.com/FireH24d/service/app/sales-api/handlers"
-	"gitlab.com/FireH24d/service/business/auth"
+	"gitlab.com/FireH24d/app/sales-api/handlers"
+	"gitlab.com/FireH24d/business/auth"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,6 +21,7 @@ import (
 	"github.com/ardanlabs/conf"
 )
 
+// build is the git version of this program. It is set using build flags in the makefile.
 var build = "develop"
 
 func main() {

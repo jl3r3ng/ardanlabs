@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"github.com/pkg/errors"
-	"gitlab.com/FireH24d/service/foundation/web"
+	"gitlab.com/FireH24d/foundation/web"
 	"log"
 	"net/http"
 	"runtime/debug"

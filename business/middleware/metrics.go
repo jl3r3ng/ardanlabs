@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"expvar"
-	"gitlab.com/FireH24d/service/foundation/web"
+	"gitlab.com/FireH24d/foundation/web"
 	"net/http"
 	"runtime"
 )

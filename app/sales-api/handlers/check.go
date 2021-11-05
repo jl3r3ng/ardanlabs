@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/pkg/errors"
-	"gitlab.com/tleuzhan13/service/foundation/web"
+	"gitlab.com/FireH24d/foundation/web"
 	"log"
 	"math/rand"
 	"net/http"

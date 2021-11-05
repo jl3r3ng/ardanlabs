@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"gitlab.com/tleuzhan13/service/business/auth"
-	"gitlab.com/tleuzhan13/service/business/middleware"
+	"gitlab.com/FireH24d/business/auth"
+	"gitlab.com/FireH24d/business/middleware"
 	"log"
 	"net/http"
 	"os"
 
-	"gitlab.com/tleuzhan13/service/foundation/web"
+	"gitlab.com/FireH24d/foundation/web"
 )
 
 func API(build string, shutdown chan os.Signal, log *log.Logger, a *auth.Auth) *web.App {
