@@ -136,6 +136,8 @@ func run(log *log.Logger) error {
 	// Start API Service
 
 	log.Println("main: Initializing API support ")
+	// Make a channel to listen for an interrupt or terminate signal from the OS.
+	// Use a buffered channel because the signal package requires it.
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
@@ -147,6 +149,7 @@ func run(log *log.Logger) error {
 	}
 
 	serverErrors := make(chan error, 1)
+	// Start the service listening for api requests.
 
 	go func() {
 		log.Printf("main: API listening on %s", api.Addr)
@@ -156,13 +159,18 @@ func run(log *log.Logger) error {
 	// =========================================================================
 	// Shutdown
 
+	// Blocking main and waiting for shutdown.
 	select {
 	case err := <-serverErrors:
 		return errors.Wrap(err, "server error")
 	case sig := <-shutdown:
 		log.Printf("main: %v : Start shutdown", sig)
+		// Give outstanding requests a deadline for completion.
+
 		ctx, cancel := context.WithTimeout(context.Background(), cfg.Web.ShutdownTimeout)
 		defer cancel()
+		// Asking listener to shutdown and shed load.
+
 		if err := api.Shutdown(ctx); err != nil {
 			api.Close()
 			return errors.Wrap(err, "could not stop server gracefully")
