@@ -26,14 +26,14 @@ func API(build string, shutdown chan os.Signal, log *log.Logger, a *auth.Auth, d
 	}
 	app.HandleDebug(http.MethodGet, "/readiness", cg.readiness)
 	app.HandleDebug(http.MethodGet, "/liveness", cg.liveness)
-
+	//hello
 	bg := bookGroup{
 		book: book.New(log, db),
 	}
 	// Register user management and authentication endpoints.
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static"))))
 
-	http.HandleFunc( "/", bg.handleListBooks)
+	http.HandleFunc("/", bg.handleListBooks)
 	http.HandleFunc("/book.html", bg.handleViewBook)
 	http.HandleFunc("/save", bg.handleSaveBook)
 	http.HandleFunc("/delete", bg.handleDeleteBook)
