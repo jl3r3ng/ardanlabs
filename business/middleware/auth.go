@@ -10,12 +10,6 @@ import (
 	"strings"
 )
 
-const (
-	indexBearer         = 0
-	indexToken          = 1
-	authorizationLength = 2
-)
-
 // Authenticate validates a JWT from the `Authorization` header.
 func Authenticate(a *auth.Auth) web.Middleware {
 
@@ -25,18 +19,19 @@ func Authenticate(a *auth.Auth) web.Middleware {
 		// Create the handler that will be attached in the middleware chain.
 		h := func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 
+
 			// Expecting: bearer <token>
 			authStr := r.Header.Get("authorization")
 
 			// Parse the authorization header.
 			parts := strings.Split(authStr, " ")
-			if len(parts) != authorizationLength || strings.ToLower(parts[indexBearer]) != "bearer" {
+			if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
 				err := errors.New("expected authorization header format: bearer <token>")
 				return web.NewRequestError(err, http.StatusUnauthorized)
 			}
 
 			// Validate the token is signed by us.
-			claims, err := a.ValidateToken(parts[indexToken])
+			claims, err := a.ValidateToken(parts[1])
 			if err != nil {
 				return web.NewRequestError(err, http.StatusUnauthorized)
 			}
@@ -63,6 +58,7 @@ func Authorize(roles ...string) web.Middleware {
 
 		// Create the handler that will be attached in the middleware chain.
 		h := func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+
 
 			// If the context is missing this value return failure.
 			claims, ok := ctx.Value(auth.Key).(auth.Claims)
