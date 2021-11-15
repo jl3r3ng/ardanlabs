@@ -53,9 +53,9 @@ func run(log *log.Logger) error {
 		}
 		DB struct {
 			User       string `conf:"default:postgres"`
-			Password   string `conf:"default:postgres,noprint"`
-			Host       string `conf:"default:db"`
-			Name       string `conf:"default:postgres"`
+			Password   string `conf:"default:serikov1!,noprint"`
+			Host       string `conf:"default:localhost:5433"`
+			Name       string `conf:"default:books_database"`
 			DisableTLS bool   `conf:"default:true"`
 		}
 	}

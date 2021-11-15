@@ -2,27 +2,29 @@ package book
 
 import (
 	"fmt"
-	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
 	"log"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
-// User manages the set of API's for user access.
+
+// Product manages the set of API's for product access.
 type Book struct {
 	log *log.Logger
 	db  *sqlx.DB
 }
 
-// New constructs a User for api access.
+// New constructs a Product for api access.
 func New(log *log.Logger, db *sqlx.DB) Book {
 	return Book{
 		log: log,
 		db:  db,
 	}
 }
-func (u Book)GetBook(bookID int) (Books, error) {
+func (p Book) GetBook(bookID int) (Booking, error) {
 	//Retrieve
-	res := Book{}
+	res := Booking{}
 
 	var id int
 	var name string
@@ -30,19 +32,19 @@ func (u Book)GetBook(bookID int) (Books, error) {
 	var pages int
 	var publicationDate pq.NullTime
 
-	err := u.db.QueryRow(`SELECT id, name, author, pages, publication_date FROM books where id = $1`, bookID).Scan(&id, &name, &author, &pages, &publicationDate)
+	err := p.db.QueryRow(`SELECT id, name, author, pages, publication_date FROM books where id = $1`, bookID).Scan(&id, &name, &author, &pages, &publicationDate)
 	if err == nil {
-		res = Book{ID: id, Name: name, Author: author, Pages: pages, PublicationDate: publicationDate.Time}
+		res = Booking{ID: id, Name: name, Author: author, Pages: pages, PublicationDate: publicationDate.Time}
 	}
 
 	return res, err
 }
 
-func (u Book) AllBooks() ([]Books, error) {
-	//Retrieve
-	books := []Books{}
+func (p Book) AllBooks() ([]Booking, error) {
 
-	rows, err := u.db.Query(`SELECT id, name, author, pages, publication_date FROM books order by id`)
+	books := []Booking{}
+
+	rows, err := p.db.Query(`SELECT id, name, author, pages, publication_date FROM books order by id`)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +62,7 @@ func (u Book) AllBooks() ([]Books, error) {
 			return books, err
 		}
 
-		currentBook := Books{ID: id, Name: name, Author: author, Pages: pages}
+		currentBook := Booking{ID: id, Name: name, Author: author, Pages: pages}
 		if publicationDate.Valid {
 			currentBook.PublicationDate = publicationDate.Time
 		}
@@ -71,10 +73,12 @@ func (u Book) AllBooks() ([]Books, error) {
 	return books, err
 }
 
-func InsertBook(name, author string, pages int, publicationDate time.Time) (int, error) {
+
+
+func (p Book) InsertBook(name, author string, pages int, publicationDate time.Time) (int, error) {
 	//Create
 	var bookID int
-	err := db.QueryRow(`INSERT INTO books(name, author, pages, publication_date) VALUES($1, $2, $3, $4) RETURNING id`, name, author, pages, publicationDate).Scan(&bookID)
+	err := p.db.QueryRow(`INSERT INTO books(name, author, pages, publication_date) VALUES($1, $2, $3, $4) RETURNING id`, name, author, pages, publicationDate).Scan(&bookID)
 
 	if err != nil {
 		return 0, err
@@ -84,9 +88,9 @@ func InsertBook(name, author string, pages int, publicationDate time.Time) (int,
 	return bookID, err
 }
 
-func UpdateBook(id int, name, author string, pages int, publicationDate time.Time) (int, error) {
+func (p Book) UpdateBook(id int, name, author string, pages int, publicationDate time.Time) (int, error) {
 	//Create
-	res, err := db.Exec(`UPDATE books set name=$1, author=$2, pages=$3, publication_date=$4 where id=$5 RETURNING id`, name, author, pages, publicationDate, id)
+	res, err := p.db.Exec(`UPDATE books set name=$1, author=$2, pages=$3, publication_date=$4 where id=$5 RETURNING id`, name, author, pages, publicationDate, id)
 	if err != nil {
 		return 0, err
 	}
@@ -99,9 +103,9 @@ func UpdateBook(id int, name, author string, pages int, publicationDate time.Tim
 	return int(rowsUpdated), err
 }
 
-func RemoveBook(bookID int) (int, error) {
+func (p Book) RemoveBook(bookID int) (int, error) {
 	//Delete
-	res, err := db.Exec(`delete from books where id = $1`, bookID)
+	res, err := p.db.Exec(`delete from books where id = $1`, bookID)
 	if err != nil {
 		return 0, err
 	}

@@ -77,4 +77,18 @@ ALTER TABLE products
 	ADD COLUMN user_id UUID DEFAULT '00000000-0000-0000-0000-000000000000'
 `,
 	},
+	{
+		Version:     2.2,
+		Description: "CREATE TABLE books",
+		Script: `
+CREATE TABLE books
+(
+ id serial NOT NULL,
+ name character varying NOT NULL,
+ author character varying,
+ pages integer,
+ publication_date date,
+ CONSTRAINT pk_books PRIMARY KEY (id )
+);`,
+	},
 }

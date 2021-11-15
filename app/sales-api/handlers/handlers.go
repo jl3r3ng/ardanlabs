@@ -26,15 +26,17 @@ func API(build string, shutdown chan os.Signal, log *log.Logger, a *auth.Auth, d
 	}
 	app.HandleDebug(http.MethodGet, "/readiness", cg.readiness)
 	app.HandleDebug(http.MethodGet, "/liveness", cg.liveness)
-	ug := bookGroup{
+
+	bg := bookGroup{
 		book: book.New(log, db),
-		auth: a,
 	}
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("www/assets"))))
-	app.Handle(http.MethodGet,"/", ug.handleListBooks, middleware.Authenticate(a))
-	http.HandleFunc("/book.html", handleViewBook)
-	http.HandleFunc("/save", handleSaveBook)
-	http.HandleFunc("/delete", handleDeleteBook)
+	// Register user management and authentication endpoints.
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static"))))
+
+	http.HandleFunc( "/", bg.handleListBooks)
+	http.HandleFunc("/book.html", bg.handleViewBook)
+	http.HandleFunc("/save", bg.handleSaveBook)
+	http.HandleFunc("/delete", bg.handleDeleteBook)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 	return app
 }

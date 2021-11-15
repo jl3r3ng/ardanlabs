@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"gitlab.com/FireH24d/business/auth"
 	"gitlab.com/FireH24d/business/data/book"
 	"html/template"
 	"io/ioutil"
@@ -14,9 +13,28 @@ import (
 
 type bookGroup struct {
 	book book.Book
-	auth *auth.Auth
 }
-func handleSaveBook(w http.ResponseWriter, r *http.Request) {
+func (bg bookGroup) handleListBooks(w http.ResponseWriter, r *http.Request) {
+	books, err := bg.book.AllBooks()
+	if err != nil {
+		renderErrorPage(w, err)
+		return
+	}
+
+	buf, err := ioutil.ReadFile("www/index.html")
+	if err != nil {
+		renderErrorPage(w, err)
+		return
+	}
+
+	var page = book.IndexPage{AllBooks: books}
+	indexPage := string(buf)
+	t := template.Must(template.New("indexPage").Parse(indexPage))
+	t.Execute(w, page)
+}
+
+
+func (bg bookGroup) handleSaveBook(w http.ResponseWriter, r *http.Request) {
 	var id = 0
 	var err error
 
@@ -57,9 +75,9 @@ func handleSaveBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if id == 0 {
-		_, err = book.InsertBook(name, author, pages, publicationDate)
+		_, err = bg.book.InsertBook(name, author, pages, publicationDate)
 	} else {
-		_, err = book.UpdateBook(id, name, author, pages, publicationDate)
+		_, err = bg.book.UpdateBook(id, name, author, pages, publicationDate)
 	}
 
 	if err != nil {
@@ -72,30 +90,11 @@ func handleSaveBook(w http.ResponseWriter, r *http.Request) {
 
 
 
-func (ug bookGroup) handleListBooks(w http.ResponseWriter, r *http.Request) {
-	books, err := ug.book.AllBooks()
-	if err != nil {
-		renderErrorPage(w, err)
-		return
-	}
-
-	buf, err := ioutil.ReadFile("www/html/index.html")
-	if err != nil {
-		renderErrorPage(w, err)
-		return
-	}
-
-	var page = IndexPage{AllBooks: books}
-	indexPage := string(buf)
-	t := template.Must(template.New("indexPage").Parse(indexPage))
-	t.Execute(w, page)
-}
-
-func handleViewBook(w http.ResponseWriter, r *http.Request) {
+func (bg bookGroup) handleViewBook(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 	idStr := params.Get("id")
 
-	var currentBook = book.Book{}
+	var currentBook = book.Booking{}
 	currentBook.PublicationDate = time.Now()
 
 	if len(idStr) > 0 {
@@ -105,14 +104,14 @@ func handleViewBook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		currentBook, err = book.GetBook(id)
+		currentBook, err = bg.book.GetBook(id)
 		if err != nil {
 			renderErrorPage(w, err)
 			return
 		}
 	}
 
-	buf, err := ioutil.ReadFile("www/html/book.html")
+	buf, err := ioutil.ReadFile("www/book.html")
 	if err != nil {
 		renderErrorPage(w, err)
 		return
@@ -128,7 +127,7 @@ func handleViewBook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleDeleteBook(w http.ResponseWriter, r *http.Request) {
+func (bg bookGroup) handleDeleteBook(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 	idStr := params.Get("id")
 
@@ -139,7 +138,7 @@ func handleDeleteBook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		n, err := book.RemoveBook(id)
+		n, err := bg.book.RemoveBook(id)
 		if err != nil {
 			renderErrorPage(w, err)
 			return
@@ -151,7 +150,7 @@ func handleDeleteBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func renderErrorPage(w http.ResponseWriter, errorMsg error) {
-	buf, err := ioutil.ReadFile("www/html/error.html")
+	buf, err := ioutil.ReadFile("www/error.html")
 	if err != nil {
 		log.Printf("%v\n", err)
 		fmt.Fprintf(w, "%v\n", err)

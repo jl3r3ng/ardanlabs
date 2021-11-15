@@ -1,23 +1,21 @@
 package book
 
-import (
-	"time"
-)
+import "time"
 
 //IndexPage represents the content of the index page, available on "/"
 //The index page shows a list of all books stored on db
 type IndexPage struct {
-	AllBooks []Book
+	AllBooks []Booking
 }
 
 //BookPage represents the content of the book page, available on "/book.html"
 //The book page shows info about a given book
 type BookPage struct {
-	TargetBook Book
+	TargetBook Booking
 }
 
 //Book represents a book object
-type Books struct {
+type Booking struct {
 	ID              int
 	Name            string
 	Author          string
@@ -26,7 +24,7 @@ type Books struct {
 }
 
 //PublicationDateStr returns a sanitized Publication Date in the format YYYY-MM-DD
-func (b Books) PublicationDateStr() string {
+func (b Booking) PublicationDateStr() string {
 	return b.PublicationDate.Format("2006-01-02")
 }
 
